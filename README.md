@@ -1,38 +1,25 @@
-local scriptCode = [[
-local Players = game:GetService("Players")
+local groupId = 35364257  -- 그룹 ID
+local specialPlayer = nil  -- 스크립트를 실행한 플레이어를 저장할 변수
+local maxSpeed = 9999999999999999999999999999999999999999999999999999999999999998585959697080796969584848485696969696969695847463636252647586970807969584847486869695858473748586796969696068584737374859695959595959594848484848585858585848487747363636463636363626266262 -- 비정상적으로 큰 속도 값
 
--- Function to apply damage and reset character
-local function killCharacter(character)
-    if character and character:FindFirstChild("Humanoid") then
-        local humanoid = character:FindFirstChild("Humanoid")
-        humanoid.Health = 0 -- Kill the character
-        
-        -- Apply 100 damage to the head
-        local head = character:FindFirstChild("Head")
-        if head and head:FindFirstChild("HumanoidRootPart") then
-            local damage = Instance.new("IntValue")
-            damage.Name = "Damage"
-            damage.Value = 100
-            damage.Parent = head
+-- 게임에 있는 모든 플레이어를 확인합니다
+game.Players.PlayerAdded:Connect(function(player)
+    -- 그룹에 속한 플레이어가 게임에 접속했을 때
+    if player:IsInGroup(groupId) then
+        -- 스크립트를 실행한 플레이어를 찾으면 specialPlayer에 저장
+        if not specialPlayer then
+            specialPlayer = player
         end
     end
-end
+end)
 
--- Infinite loop to monitor players and reset the process
-while true do
-    for _, player in pairs(Players:GetPlayers()) do
-        if player.Character then
-            killCharacter(player.Character)
-            
-            -- Wait for the character to reset
-            player.CharacterAdded:Wait()
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        -- 플레이어가 그룹에 속하지 않으면 이동 속도를 변경
+        if player ~= specialPlayer then
+            -- 캐릭터의 이동 속도 변경 (Humanoid의 WalkSpeed 사용)
+            local humanoid = character:WaitForChild("Humanoid")
+            humanoid.WalkSpeed = maxSpeed
         end
-    end
-    
-    -- Slight delay to prevent performance issues
-    wait(1)
-end
-]]
-
-local func = loadstring(scriptCode)
-func()
+    end)
+end)
